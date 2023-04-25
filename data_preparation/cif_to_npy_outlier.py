@@ -9,7 +9,7 @@ import random as rng
 
 
 if __name__ == '__main__':
-    cif_dir = '/home/dojoh/projects/postdoc/local_data/2023.04.20-20C-community-trainingsdata/CRP_Chlamydomonas_reinhardtii'
+    cif_dir = '/home/dojoh/projects/postdoc/local_data/2023.04.14-20C-community/franzi'
 
     channels = [0, 8, 4, 10]
     write_outliers = False
