@@ -2,6 +2,8 @@ import numpy as np
 import os
 from pathlib import Path
 from utils import *
+import glob
+import pandas as pd
 
 
 import random as rng
@@ -9,11 +11,11 @@ import random as rng
 
 
 if __name__ == '__main__':
-    cif_dir = '/home/dlpc/data/anh/2023.04.20-20C-community-trainingsdata/data'
+    cif_dir = '/home/dlpc/data/anh/2023.06.06-pedeastrum/16C/data'
 
     channels = [0, 8, 4, 10]
-    selection_type = [False, "outliers", "inliers"] #how to treat the selection? ignore = None, or as inliers/outliers?
-    selection_type = selection_type[2]
+    selection_type = [False, "outliers", "inliers"] #how to treat the selection?
+    selection_type = selection_type[2] #0 = ignore, 1 = outliers, 2 = inliers
     # channels = [0, 8, 6, 7]
 
     vars = [0.01, 0.026, 0.026, 0.026, 0.02, 0.026, 0.026, 0.026, 0.005, 0.026, 0.05, 0.026]
@@ -36,12 +38,24 @@ if __name__ == '__main__':
     init_javabridge()
 
 
+
     for cif_file in cif_files:
             class_data = list()
 
-            outliers = read_outliers(os.path.join(cif_file.parent, cif_file.stem + '.outliers'))
+            selection = []
+            for file in glob.glob(os.path.join(cif_file.parent, "selection_*_ids.csv")):
+                df = pd.read_csv(file)
+                selection.append(df)
+            selection = pd.concat(selection, axis=0, ignore_index=True)
 
-            cif_data = load_cif(cif_file.as_posix(), channels=channels, outliers=outliers)
+            selection = selection[selection.file == cif_file.stem]["Object Number"].tolist()
+
+            if not selection_type:
+                cif_data = load_cif(cif_file.as_posix(), channels=channels)
+            elif selection_type == "outliers":
+                cif_data = load_cif(cif_file.as_posix(), channels=channels, outliers=selection)
+            else:
+                cif_data = load_cif(cif_file.as_posix(), channels=channels, inliers=selection)
 
             # tmp_length = class_data.__len__()
             for clean_task in clean_tasks:

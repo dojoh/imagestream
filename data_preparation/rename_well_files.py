@@ -8,14 +8,20 @@ import os
 import shutil
 
 if __name__ == '__main__':
-    data_path = "/home/dojoh/projects/postdoc/local_data/2023.04.20-20C-communitt-trainingsdata/Day_12/"
+    data_path = "/home/dlpc/data/anh/2023.06.06-pedeastrum/16C/Run_5"
 
-    patterns = [['13_Scenedesmus_obliquus_Day_12', ['A10', 'B10', 'C10', 'D10']],
-                ['21-P_Chlorella_vulgaris_Day_12', ['E10', 'F10', 'G10', 'H10']],
-                ['17_Pediastrum_boryanum_Day_12', ['A11', 'B11', 'C11', 'D11']],
-                ['40-aP_Monoraphidium_minutum_Day_12', ['E11', 'F11', 'G11', 'H11']],
-                ['23_Monoraphidium_obtusum_Day_12', ['A12', 'B12', 'C12', 'D12']],
-                ['CRP_Chlamydomonas_reinhardtii_Day_12', ['E12', 'F12', 'G12', 'H12']]
+    patterns = [['17_Pediastrum_boryanum_new_run5_Day_06', ['A01', 'B01', 'C01', 'D01',
+                                                   'A05', 'B05', 'C05', 'D05',
+                                                   'A09', 'B09', 'C09', 'D09']],
+                ['17_Pediastrum_boryanum_new_run5_Day_08', ['A02', 'B02', 'C02', 'D02',
+                                                   'A06', 'B06', 'C06', 'D06',
+                                                   'A10', 'B10', 'C10', 'D10']],
+                ['17_Pediastrum_boryanum_new_run5_Day_10', ['A03', 'B03', 'C03', 'D03',
+                                                   'A07', 'B07', 'C07', 'D07',
+                                                   'A11', 'B11', 'C11', 'D11']],
+                ['17_Pediastrum_boryanum_new_run5_Day_12', ['A04', 'B04', 'C04', 'D04',
+                                                   'A08', 'B08', 'C08', 'D08',
+                                                   'A12', 'B12', 'C12', 'D12']],
                 ]
 
     #sanity checks: are there any duplicates?

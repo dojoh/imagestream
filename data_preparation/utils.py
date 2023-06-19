@@ -137,6 +137,7 @@ def clean_cut(data, cut_size):
 
 
 def clean_cut_single(data, cut_size=64, mask_channel=2, min_threshold=0):
+    # tries to detect individual cells inside the image and only cuts out those.
     data_out=[]
     for i_data in tqdm(range(data.__len__()), desc=sys._getframe().f_code.co_name + ": "):
         mask = nsbatwm.threshold_isodata(data[i_data][:, :, mask_channel])
@@ -221,10 +222,13 @@ def clean_pca_orientation(data):
     return data
 
 
-def load_cif(filename, channels=None, outliers=[]):
+def load_cif(filename, channels=None, outliers=[], inliers=[]):
     print('loading cif file: ' + filename)
     with bioformats.ImageReader(filename, perform_init=True) as reader:
         image_count = reader.rdr.getSeriesCount()
+        if inliers:
+            outliers = list(range(image_count//2))
+            outliers = [o for o in outliers if o not in inliers]
         load_cif_data = list()
         for i_image in tqdm(range(0, image_count, 2), desc="load_cif: "):
             if i_image//2 in outliers:
