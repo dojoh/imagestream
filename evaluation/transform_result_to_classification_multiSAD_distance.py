@@ -9,10 +9,10 @@ from tqdm import tqdm
 #28C done
 #
 if __name__ == "__main__":
-    file_sad = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/results/multiSAD_anh_community_all_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230704_114257_output_distance.npy"
-    data_folder_test = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/data"
+    file_sad = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/results/multiSAD_anh_community_sep_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230706_132556_output_distance.npy"
+    data_folder_test = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/data/"
 
-    threshold = 0.6
+    threshold = 1
 
     # samples = 100
     # images_per_page = 10

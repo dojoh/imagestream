@@ -14,6 +14,8 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
+
+
 def chunks(lst, n):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
@@ -100,8 +102,10 @@ class npyData:
 
 if __name__ == "__main__":
     data_path = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/data"
+    # data_path = "/home/o340n/projects/2023-konstanz/data/2023.06.06-temperature_trainingsdata_plus_pediastrum/28C_split_2000/test"
     pattern = "classification_multiSAD_anh_community_all_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230704_114257_output_distance_threshold_0.6"
-    # pattern = "classification_tsne"
+    pattern = "classification_tsne"
+    pattern = "classification_multiSAD_anh_community_sep_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230706_132556_output_distance_threshold_1.csv"
 
     classes = ['outliers',
                '13_Scenedesmus_obliquus',
@@ -111,6 +115,26 @@ if __name__ == "__main__":
                '40-aP_Monoraphidium_minutum',
                'CRP_Chlamydomonas_reinhardtii'
                ]
+    # classes = ['outliers',
+    #            '13_Scenedesmus_obliquus_16C',
+    #            '13_Scenedesmus_obliquus_20C',
+    #            '13_Scenedesmus_obliquus_28C',
+    #            '17_Pediastrum_boryanum_16C',
+    #            '17_Pediastrum_boryanum_20C',
+    #            '17_Pediastrum_boryanum_28C',
+    #            '21-P_Chlorella_vulgaris_16C',
+    #            '21-P_Chlorella_vulgaris_20C',
+    #            '21-P_Chlorella_vulgaris_28C',
+    #            '23_Monoraphidium_obtusum_16C',
+    #            '23_Monoraphidium_obtusum_20C',
+    #            '23_Monoraphidium_obtusum_28C',
+    #            '40-aP_Monoraphidium_minutum_16C',
+    #            '40-aP_Monoraphidium_minutum_20C',
+    #            '40-aP_Monoraphidium_minutum_28C',
+    #            'CRP_Chlamydomonas_reinhardtii_16C',
+    #            'CRP_Chlamydomonas_reinhardtii_20C',
+    #            'CRP_Chlamydomonas_reinhardtii_28C'
+    #            ]
     class_counts = []
 
     vis_channels = [0, 8, 4, 10]
@@ -124,8 +148,8 @@ if __name__ == "__main__":
 
     for file in Path(data_path).rglob('*' + pattern + '*'):
         print(file)
-        class_counts_per_file = [0] * (classes.__len__()+1)
-        class_counts_per_file[0] = '_'.join([file.parent.name,file.name[:3]])
+        class_counts_per_file = [0] * (classes.__len__() + 1)
+        class_counts_per_file[0] = '_'.join([file.parent.name, file.name[:3]])
         npy_candidates = [x.name for x in Path(file.parent).rglob('*.npy')]
         npy_file = difflib.get_close_matches(file.name, npy_candidates, n=1, cutoff=0)
 
@@ -133,7 +157,7 @@ if __name__ == "__main__":
         classification_data = np.atleast_1d(np.genfromtxt(file)) + 1
         unique, counts = np.unique(classification_data, return_counts=True)
         for u, c in zip(unique, counts):
-            class_counts_per_file[int(u)+1] += c
+            class_counts_per_file[int(u) + 1] += c
 
         class_counts.append(class_counts_per_file)
 
@@ -153,6 +177,10 @@ if __name__ == "__main__":
     fig, axs = plt.subplots()
 
     format = '.2%'
-    sns.heatmap(df.iloc[:, 1:].T, annot=True, fmt=format, ax=axs, xticklabels=df.iloc[:, 0])
-    # plt.tight_layout()
+    manager = plt.get_current_fig_manager()
+    manager.window.showMaximized()
+    sns.heatmap(df.iloc[:, 1:].T, annot=True, fmt=format, ax=axs, xticklabels=df.iloc[:, 0],
+                annot_kws={'rotation': 90, "fontsize": 6})
+    plt.tight_layout()
+    plt.title(pattern)
     plt.show()
