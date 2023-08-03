@@ -9,8 +9,8 @@ from tqdm import tqdm
 #28C done
 #
 if __name__ == "__main__":
-    file_sad = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/results/multiSAD_anh_community_sep_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230706_132556_output_distance.npy"
-    data_folder_test = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/data/"
+    file_sad = "/home/o340n/projects/2023-konstanz/data/2023.06.06-temperature_trainingsdata_plus_pediastrum/results/28C_multiSAD_anh_community_sep_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230706_132556_output_distance.npy"
+    data_folder_test = "/home/o340n/projects/2023-konstanz/data/2023.06.06-temperature_trainingsdata_plus_pediastrum/28C"
 
     threshold = 1
 

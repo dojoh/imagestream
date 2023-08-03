@@ -5,8 +5,8 @@ import os
 from tqdm import tqdm
 
 if __name__ == '__main__':
-    data_path = "/home/o340n/projects/2023-konstanz/data/2023.06.06-temperature_trainingsdata_plus_pediastrum/28C"
-    output_path = "/home/o340n/projects/2023-konstanz/data/2023.06.06-temperature_trainingsdata_plus_pediastrum/28C_split_2000"
+    data_path = "/home/o340n/projects/2023-konstanz/data/2023.07.14-temperature-trainingsdata-plus-pediastrum-128/28C"
+    output_path = "/home/o340n/projects/2023-konstanz/data/2023.07.14-temperature-trainingsdata-plus-pediastrum-128/28C_split_2000"
     train_split = 0.8
     max_samples = 2000
 

@@ -14,6 +14,7 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 import matplotlib
+import time
 
 
 def chunks(lst, n):
@@ -101,11 +102,14 @@ class npyData:
 
 
 if __name__ == "__main__":
-    data_path = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/data"
+    data_path = "/home/o340n/projects/2023-konstanz/data/2023.04.14-20C-community/data/"
     # data_path = "/home/o340n/projects/2023-konstanz/data/2023.06.06-temperature_trainingsdata_plus_pediastrum/28C_split_2000/test"
-    pattern = "classification_multiSAD_anh_community_all_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230704_114257_output_distance_threshold_0.6"
+    pattern = "multiSAD_anh_community_sep_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230706_132556_output_distance_threshold_1"
     pattern = "classification_tsne"
-    pattern = "classification_multiSAD_anh_community_sep_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230706_132556_output_distance_threshold_1.csv"
+    # pattern = "classification_multiSAD_anh_community_sep_c_plus_pediastrum_inlier_rotate_split_2000_rotate_230706_132556_output_distance_threshold_1.csv"
+
+    output_folder = "/home/o340n/projects/2023-konstanz/communication/anh/2023_07_07_temperature_experiment_fix/"
+    name = ["tsne", "Com1"]
 
     classes = ['outliers',
                '13_Scenedesmus_obliquus',
@@ -146,10 +150,11 @@ if __name__ == "__main__":
     for class_name in classes:
         Path(os.path.join(output_path, class_name)).mkdir(parents=True, exist_ok=True)
 
-    for file in Path(data_path).rglob('*' + pattern + '*'):
+    for file in natsorted(Path(data_path).rglob('*' + pattern + '*')):
         print(file)
         class_counts_per_file = [0] * (classes.__len__() + 1)
         class_counts_per_file[0] = '_'.join([file.parent.name, file.name[:3]])
+        # class_counts_per_file[0] = file.name.split("_inliers")[0]
         npy_candidates = [x.name for x in Path(file.parent).rglob('*.npy')]
         npy_file = difflib.get_close_matches(file.name, npy_candidates, n=1, cutoff=0)
 
@@ -174,13 +179,15 @@ if __name__ == "__main__":
     df = pd.DataFrame(class_counts, columns=['name'] + classes)
     df.iloc[:, 1:] = df.iloc[:, 1:].div(df.sum(axis=1), axis=0)
 
-    fig, axs = plt.subplots()
+    fig, axs = plt.subplots(figsize=(20, 12))
 
     format = '.2%'
-    manager = plt.get_current_fig_manager()
-    manager.window.showMaximized()
-    sns.heatmap(df.iloc[:, 1:].T, annot=True, fmt=format, ax=axs, xticklabels=df.iloc[:, 0],
+    b  = sns.heatmap(df.iloc[:, 1:].T, annot=True, fmt=format, ax=axs, xticklabels=df.iloc[:, 0],
                 annot_kws={'rotation': 90, "fontsize": 6})
+    # b.set_xticklabels(b.get_xticklabels(), size=6)
     plt.tight_layout()
     plt.title(pattern)
     plt.show()
+
+    plt.savefig(os.path.join(output_folder, "confusion_matrix_" + name[0] + "_predicts_" + name[1] + ".png"),
+                bbox_inches='tight', dpi=150)

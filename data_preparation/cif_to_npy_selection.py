@@ -11,7 +11,7 @@ import random as rng
 
 
 if __name__ == '__main__':
-    cif_dir = '/home/dlpc/data/anh/2023.06.06-pedeastrum/16C/data'
+    cif_dir = '/home/o340n/projects/2023-konstanz/data/2023.05.23-16C-community-trainingsdata/trainingdata/'
 
     channels = [0, 8, 4, 10]
     selection_type = [False, "outliers", "inliers"] #how to treat the selection?
@@ -20,8 +20,8 @@ if __name__ == '__main__':
 
     vars = [0.01, 0.026, 0.026, 0.026, 0.02, 0.026, 0.026, 0.026, 0.005, 0.026, 0.05, 0.026]
     # vars = [var*2 for var in vars]
-    cut_size = 64
-    final_size = 64
+    cut_size = 128
+    final_size = 128
     max_number_per_cif = 50000
 
     clean_tasks = ["median", "normalize", "cut"] #'pca_orientation',
@@ -46,9 +46,9 @@ if __name__ == '__main__':
             for file in glob.glob(os.path.join(cif_file.parent, "selection_*_ids.csv")):
                 df = pd.read_csv(file)
                 selection.append(df)
-            selection = pd.concat(selection, axis=0, ignore_index=True)
-
-            selection = selection[selection.file == cif_file.stem]["Object Number"].tolist()
+            if selection:
+                selection = pd.concat(selection, axis=0, ignore_index=True)
+                selection = selection[selection.file == cif_file.stem]["Object Number"].tolist()
 
             if not selection_type:
                 cif_data = load_cif(cif_file.as_posix(), channels=channels)
