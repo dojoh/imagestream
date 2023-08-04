@@ -11,11 +11,11 @@ import random as rng
 
 
 if __name__ == '__main__':
-    cif_dir = '/home/o340n/projects/2023-konstanz/data/2023.05.23-16C-community-trainingsdata/trainingdata/'
+    cif_dir = '/home/o340n/projects/2023-konstanz/data/2023.08.3-newdata/training_data/Species_Com3/20C/Day_08/files/'
 
     channels = [0, 8, 4, 10]
     selection_type = [False, "outliers", "inliers"] #how to treat the selection?
-    selection_type = selection_type[2] #0 = ignore, 1 = outliers, 2 = inliers
+    selection_type = selection_type[0] #0 = ignore, 1 = outliers, 2 = inliers
     # channels = [0, 8, 6, 7]
 
     vars = [0.01, 0.026, 0.026, 0.026, 0.02, 0.026, 0.026, 0.026, 0.005, 0.026, 0.05, 0.026]
