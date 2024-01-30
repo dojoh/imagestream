@@ -1,5 +1,4 @@
-from pathlib import Path
-from natsort import natsorted
+import natsort
 import numpy as np
 import scipy.signal
 import scipy.ndimage
@@ -9,19 +8,19 @@ import os
 from sklearn.decomposition import PCA
 from scipy import ndimage
 import math
-import zipfile
+
 import torch
 from torchvision.transforms.functional import pad, resize
 import torchvision.transforms as T
-# import bioformats
-# import bioformats.formatreader
-# import javabridge
-# import javabridge.jutil
-import io
+import bioformats
+import bioformats.formatreader
+import javabridge
+import javabridge.jutil
+
 from bokeh.plotting import figure, show
 from bokeh.models import ColorBar, LinearColorMapper, WheelZoomTool, Label
-from tifffile import TiffFile
-# import napari_segment_blobs_and_things_with_membranes as nsbatwm  # version 0.3.4
+
+import napari_segment_blobs_and_things_with_membranes as nsbatwm  # version 0.3.4
 
 
 def fi(image, image_range=False):
@@ -100,16 +99,16 @@ def cut_pad_resize_image(image, center, cut_size, final_size):
     return image
 
 
-# def init_javabridge():
-#     javabridge.start_vm(class_path=bioformats.JARS, max_heap_size='8G')
-#     rootLoggerName = javabridge.get_static_field("org/slf4j/Logger", "ROOT_LOGGER_NAME", "Ljava/lang/String;")
-#     rootLogger = javabridge.static_call("org/slf4j/LoggerFactory", "getLogger",
-#                                         "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
-#     logLevel = javabridge.get_static_field("ch/qos/logback/classic/Level", "ERROR", "Lch/qos/logback/classic/Level;")
-#     javabridge.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V", logLevel)
-#
-# def kill_javabridge():
-#     javabridge.kill_vm()
+def init_javabridge():
+    javabridge.start_vm(class_path=bioformats.JARS, max_heap_size='8G')
+    rootLoggerName = javabridge.get_static_field("org/slf4j/Logger", "ROOT_LOGGER_NAME", "Ljava/lang/String;")
+    rootLogger = javabridge.static_call("org/slf4j/LoggerFactory", "getLogger",
+                                        "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
+    logLevel = javabridge.get_static_field("ch/qos/logback/classic/Level", "ERROR", "Lch/qos/logback/classic/Level;")
+    javabridge.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V", logLevel)
+
+def kill_javabridge():
+    javabridge.kill_vm()
 
 def clean_cut(data, cut_size):
     for i_data in tqdm(range(data.__len__()), desc=sys._getframe().f_code.co_name + ": "):
@@ -208,7 +207,9 @@ def clean_normalize(data, var):
 
 
 def clean_pca_orientation(data):
-    for i_data in tqdm(range(data.__len__()), desc=sys._getframe().f_code.co_name + ": "):
+    for i_data in tqdm(
+        range(data.__len__()), desc=sys._getframe().f_code.co_name + ": "
+    ):
         mask = np.amax(np.abs(data[i_data]), 2)
 
         mask = mask > np.quantile(mask.flatten(), 0.9)
@@ -218,8 +219,16 @@ def clean_pca_orientation(data):
 
         pca = PCA(n_components=2)
         pca.fit(X)
-        rotation_angle = math.degrees(math.atan(pca.components_[0][0] / (pca.components_[0][1]+1e-5)))
-        data[i_data] = ndimage.rotate(data[i_data], rotation_angle + 90, mode='nearest', axes=(0, 1), reshape=False)
+        rotation_angle = math.degrees(
+            math.atan(pca.components_[0][0] / (pca.components_[0][1] + 1e-5))
+        )
+        data[i_data] = ndimage.rotate(
+            data[i_data],
+            rotation_angle + 90,
+            mode="nearest",
+            axes=(0, 1),
+            reshape=False,
+        )
 
     return data
 
