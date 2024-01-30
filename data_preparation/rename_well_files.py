@@ -12,31 +12,48 @@ import os
 import shutil
 
 if __name__ == '__main__':
-    data_path = "/home/o340n/projects/2023-konstanz/data/2023.08.3-newdata/training_data/Species_Com2/raw/20C/Day_06/"
+    data_path = "/media/dojoh/data/projects/2023-konstanz/data/temperature_exp/com3/20C/Day_12"
+    day = data_path[-2:]
+    # day = data_path[-7:] #if /runX at the end
+    # day = day.replace('/','_')
     runs_present = True
-    # Community 2
-    patterns = [['Sphaerocystis_sp_Day_06', ['A01', 'B01', 'C01', 'D01',
-                                             'A04', 'B04', 'C04', 'D04',
-                                             'A07', 'B07', 'C07', 'D07',
-                                             'A10', 'B10', 'C10', 'D10']],
-                ['C_augustae_Day_06', ['A02', 'B02', 'C02', 'D02',
-                                       'A05', 'B05', 'C05', 'D05',
-                                       'A08', 'B08', 'C08', 'D08',
-                                       'A11', 'B11', 'C11', 'D11']],
-                ['L_culleus_Day_06', ['A03', 'B03', 'C03', 'D03',
-                                      'A06', 'B06', 'C06', 'D06',
-                                      'A09', 'B09', 'C09', 'D09',
-                                      'A12', 'B12', 'C12', 'D12']],
-                ]
-    # patterns = [['C_minutissima_Day_12', ['A01', 'B01', 'C01', 'D01',
-    #                                       'A05', 'B05', 'C05', 'D05']],
-    #             ['C_luteoviridis_Day_12', ['A02', 'B02', 'C02', 'D02',
-    #                                        'A06', 'B06', 'C06', 'D06']],
-    #             ['S_intermedius_Day_12', ['A03', 'B03', 'C03', 'D03',
-    #                                       'A07', 'B07', 'C07', 'D07']],
-    #             ['S_quadricauda_Day_12', ['A04', 'B04', 'C04', 'D04',
-    #                                       'A08', 'B08', 'C08', 'D08']],
+    # patterns = [['17_Pediastrum_boryanum_new_run5_Day_06', ['A01', 'B01', 'C01', 'D01',
+    #                                                'A05', 'B05', 'C05', 'D05',
+    #                                                'A09', 'B09', 'C09', 'D09']],
+    #             ['17_Pediastrum_boryanum_new_run5_Day_08', ['A02', 'B02', 'C02', 'D02',
+    #                                                'A06', 'B06', 'C06', 'D06',
+    #                                                'A10', 'B10', 'C10', 'D10']],
+    #             ['17_Pediastrum_boryanum_new_run5_Day_10', ['A03', 'B03', 'C03', 'D03',
+    #                                                'A07', 'B07', 'C07', 'D07',
+    #                                                'A11', 'B11', 'C11', 'D11']],
+    #             ['17_Pediastrum_boryanum_new_run5_Day_12', ['A04', 'B04', 'C04', 'D04',
+    #                                                'A08', 'B08', 'C08', 'D08',
+    #                                                'A12', 'B12', 'C12', 'D12']],
     #             ]
+
+    # Community 2
+    # patterns = [['Sphaerocystis_sp_Day_' + day, ['A01', 'B01', 'C01', 'D01',
+    #                                          'A04', 'B04', 'C04', 'D04',
+    #                                          'A07', 'B07', 'C07', 'D07',
+    #                                          'A10', 'B10', 'C10', 'D10']],
+    #             ['C_augustae_Day_' + day, ['A02', 'B02', 'C02', 'D02',
+    #                                    'A05', 'B05', 'C05', 'D05',
+    #                                    'A08', 'B08', 'C08', 'D08',
+    #                                    'A11', 'B11', 'C11', 'D11']],
+    #             ['L_culleus_Day_' + day, ['A03', 'B03', 'C03', 'D03',
+    #                                   'A06', 'B06', 'C06', 'D06',
+    #                                   'A09', 'B09', 'C09', 'D09',
+    #                                   'A12', 'B12', 'C12', 'D12']],
+    #             ]
+    patterns = [['C_minutissima_Day_' + day, ['A01', 'B01', 'C01', 'D01',
+                                              'A05', 'B05', 'C05', 'D05']],
+                ['C_luteoviridis_Day_' + day, ['A02', 'B02', 'C02', 'D02',
+                                               'A06', 'B06', 'C06', 'D06']],
+                ['S_intermedius_Day_' + day, ['A03', 'B03', 'C03', 'D03',
+                                              'A07', 'B07', 'C07', 'D07']],
+                ['S_quadricauda_Day_' + day, ['A04', 'B04', 'C04', 'D04',
+                                              'A08', 'B08', 'C08', 'D08']],
+                ]
 
     # sanity checks: are there any duplicates?
     all_wells = [p for pattern in patterns for p in pattern[1]]
@@ -93,10 +110,12 @@ if __name__ == '__main__':
                     print("moving " + image_file.name + " to " + pattern_dict[parts[0]])
                     # shutil.move(image_file, os.path.join(data_path, pattern_dict[parts[0]], image_file.name))
                     if runs_present:
-                        os.rename(image_file, os.path.join(data_path, #pattern_dict[parts[0]],
-                                                           '_'.join([pattern_dict[parts[0]], str(image_file)[len(data_path):].split(os.sep)[0], image_file.name])))
+                        os.rename(image_file, os.path.join(data_path,  # pattern_dict[parts[0]],
+                                                           '_'.join([pattern_dict[parts[0]],
+                                                                     str(image_file)[len(data_path):].split(os.sep)[0],
+                                                                     image_file.name])))
                     else:
-                        os.rename(image_file, os.path.join(data_path, #pattern_dict[parts[0]],
+                        os.rename(image_file, os.path.join(data_path,  # pattern_dict[parts[0]],
                                                            '_'.join([pattern_dict[parts[0]], image_file.name])))
 
 

@@ -60,7 +60,7 @@ if __name__ == '__main__':
             # tmp_length = class_data.__len__()
             for clean_task in clean_tasks:
                 if clean_task == 'median':
-                    cif_data = clean_median(cif_data)
+                    cif_data = clean_median(cif_data, remove_hotpixels=True)
                 elif clean_task == 'cut':
                     cif_data = clean_cut(cif_data, cut_size)
                 elif clean_task == 'cut_single':

@@ -1,4 +1,5 @@
-import natsort
+from pathlib import Path
+from natsort import natsorted
 import numpy as np
 import scipy.signal
 import scipy.ndimage
@@ -8,19 +9,19 @@ import os
 from sklearn.decomposition import PCA
 from scipy import ndimage
 import math
-
+import zipfile
 import torch
 from torchvision.transforms.functional import pad, resize
 import torchvision.transforms as T
-import bioformats
-import bioformats.formatreader
-import javabridge
-import javabridge.jutil
-
+# import bioformats
+# import bioformats.formatreader
+# import javabridge
+# import javabridge.jutil
+import io
 from bokeh.plotting import figure, show
 from bokeh.models import ColorBar, LinearColorMapper, WheelZoomTool, Label
-
-import napari_segment_blobs_and_things_with_membranes as nsbatwm  # version 0.3.4
+from tifffile import TiffFile
+# import napari_segment_blobs_and_things_with_membranes as nsbatwm  # version 0.3.4
 
 
 def fi(image, image_range=False):
@@ -99,16 +100,16 @@ def cut_pad_resize_image(image, center, cut_size, final_size):
     return image
 
 
-def init_javabridge():
-    javabridge.start_vm(class_path=bioformats.JARS, max_heap_size='8G')
-    rootLoggerName = javabridge.get_static_field("org/slf4j/Logger", "ROOT_LOGGER_NAME", "Ljava/lang/String;")
-    rootLogger = javabridge.static_call("org/slf4j/LoggerFactory", "getLogger",
-                                        "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
-    logLevel = javabridge.get_static_field("ch/qos/logback/classic/Level", "ERROR", "Lch/qos/logback/classic/Level;")
-    javabridge.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V", logLevel)
-
-def kill_javabridge():
-    javabridge.kill_vm()
+# def init_javabridge():
+#     javabridge.start_vm(class_path=bioformats.JARS, max_heap_size='8G')
+#     rootLoggerName = javabridge.get_static_field("org/slf4j/Logger", "ROOT_LOGGER_NAME", "Ljava/lang/String;")
+#     rootLogger = javabridge.static_call("org/slf4j/LoggerFactory", "getLogger",
+#                                         "(Ljava/lang/String;)Lorg/slf4j/Logger;", rootLoggerName)
+#     logLevel = javabridge.get_static_field("ch/qos/logback/classic/Level", "ERROR", "Lch/qos/logback/classic/Level;")
+#     javabridge.call(rootLogger, "setLevel", "(Lch/qos/logback/classic/Level;)V", logLevel)
+#
+# def kill_javabridge():
+#     javabridge.kill_vm()
 
 def clean_cut(data, cut_size):
     for i_data in tqdm(range(data.__len__()), desc=sys._getframe().f_code.co_name + ": "):
@@ -186,13 +187,14 @@ def clean_cut_single(data, cut_size=64, mask_channel=2, min_threshold=0):
 
     return data_out
 
-def clean_median(data):
+def clean_median(data, remove_hotpixels=False):
     for i_data in tqdm(range(data.__len__()), desc=sys._getframe().f_code.co_name + ": "):
         for i_channel in range(data[i_data].shape[2]):
             #sometimes there are hot pixels (>0.8). fill those with 2d median filter
-            fill = scipy.signal.medfilt2d(data[i_data][:, :, i_channel])
-            mask = data[i_data][:, :, i_channel] > 0.8
-            data[i_data][:, :, i_channel][mask] = fill[mask]
+            if remove_hotpixels:
+                fill = scipy.signal.medfilt2d(data[i_data][:, :, i_channel])
+                mask = data[i_data][:, :, i_channel] > 0.8
+                data[i_data][:, :, i_channel][mask] = fill[mask]
             median = np.median(data[i_data][:, :, i_channel].flatten())
             data[i_data][:, :, i_channel] = (data[i_data][:, :, i_channel] - median)
     return data
@@ -239,6 +241,31 @@ def load_cif(filename, channels=None, outliers=[], inliers=[]):
             load_cif_data.append(np.stack(tmp_data, axis=2))
 
     return load_cif_data
+
+def load_zip(filename, channels=None, outliers=[], inliers=[]):
+    print('loading zip file: ' + filename)
+    archive = zipfile.ZipFile(filename, 'r')
+    namelist = archive.namelist()
+    image_names = natsorted(list(set([Path(x).name.split("_")[0] for x in namelist])))
+    folder = str(Path(namelist[0]).parent)
+    if inliers:
+        outliers = [int(x) for x in image_names]
+        outliers = [o for o in outliers if o not in inliers]
+    load_data = []
+    for i_image in tqdm(image_names, desc="loading_zip: "):
+        if i_image in outliers:
+            continue
+        tmp_data = []
+        for channel in channels:
+            tmp_name = os.path.join(folder, i_image + "_Ch" + str(channel) + ".ome.tif")
+            # tmp_data.append(archive.open(tmp_name))
+            with io.BytesIO(archive.read(tmp_name)) as file_like_object:
+                with TiffFile(file_like_object) as tiff_file:
+                    image = tiff_file.asarray()
+                    tmp_data.append(image.astype(np.float32))
+        load_data.append(np.stack(tmp_data, axis=2))
+
+    return load_data
 
 
 def read_outliers(path):
